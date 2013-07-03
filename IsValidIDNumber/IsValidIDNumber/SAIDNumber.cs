@@ -20,7 +20,10 @@ namespace IsValidIDNumber
         {
             string idnumbertrimmed = inputIdNumber.Trim();
             string idnumberReplaceStrings = idnumbertrimmed.Replace(" ", "");
-            if (!IsValidLength(idnumberReplaceStrings) || !IsValidMonth(idnumberReplaceStrings) || !IsValidDate(idnumberReplaceStrings) || !IsValidDay(idnumberReplaceStrings))
+            if (!IsValidLength(idnumberReplaceStrings) || 
+                !IsValidMonth(idnumberReplaceStrings) || 
+                !IsValidDate(idnumberReplaceStrings) || 
+                !IsValidDay(idnumberReplaceStrings))
             return false;
             return true;
         }
@@ -50,7 +53,36 @@ namespace IsValidIDNumber
 
         public object SumOddNumbers(string inputString)
         {
-            return 14;
+            //8001015009087
+            //8 0 0 5 0 0 
+            //Console.WriteLine("TEST");
+            int sumOddNumber = 0;
+            string inputStringreplacedSpaces = inputString.Replace(" ", "");
+            for (int i = 0; i < inputStringreplacedSpaces.Length-1; i++)
+            {
+                if (i%2 == 0)
+                {
+                    //sumOddNumber += Convert.ToInt32(inputStringreplacedSpaces[i]);
+                    sumOddNumber += Convert.ToInt32(inputStringreplacedSpaces[i].ToString());
+                    //Console.WriteLine(inputStringreplacedSpaces[i]+ " "+ sumOddNumber);
+                }
+            }
+            return sumOddNumber;
+        }
+
+        public int ConcatenateEvenNumbers(string inputString)
+        {
+            string concatenatedNumber = String.Empty;
+            string inputStringreplacedSpaces = inputString.Replace(" ", "");
+            for (int i = 0; i < inputStringreplacedSpaces.Length - 1; i++)
+            {
+                if (i % 2 != 0)
+                {
+                    concatenatedNumber += inputStringreplacedSpaces[i];
+                    Console.WriteLine(inputStringreplacedSpaces[i]+ " ");
+                }
+            }
+            return Convert.ToInt32(concatenatedNumber);
         }
     }
 
@@ -67,17 +99,6 @@ namespace IsValidIDNumber
             var sut = new SAIDNumber().IsValidLength(idnumber);
             //Assert			
             Assert.That(sut,Is.EqualTo(true));
-        }
-
-
-        [Test]
-        public void IgnoresSpaces()
-        {
-            var idnumber = "12 34 5 6789 0123";
-            //Act			
-            var sut = new SAIDNumber().IsValidLength(idnumber);
-            //Assert			
-            Assert.That(sut, Is.EqualTo(true));
         }
 
 
@@ -146,6 +167,16 @@ namespace IsValidIDNumber
             Assert.That(sut, Is.EqualTo(expectedResult));
         }
 
+        [Test]
+        public void IgnoresSpaces()
+        {
+            var idnumber = "77 06 27 5007 08 1";
+            //Act			
+            var sut = new SAIDNumber().IsValid(idnumber);
+            //Assert			
+            Assert.That(sut, Is.EqualTo(true));
+        }
+
 
         [Test]
         public void SumOfOddNumbers()
@@ -156,6 +187,17 @@ namespace IsValidIDNumber
             var sut = new SAIDNumber().SumOddNumbers(inputString);
             //Assert			
             Assert.That(sut, Is.EqualTo(13));
+        }
+
+        [Test]
+        public void ConcatenateEvenNumbers()
+        {
+            //Arrange
+            var inputString = "800101 5009 087";
+            //Act			
+            var sut = new SAIDNumber().ConcatenateEvenNumbers(inputString);
+            //Assert			
+            Assert.That(sut, Is.EqualTo(011098));
         }
 
 
