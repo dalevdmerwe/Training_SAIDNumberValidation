@@ -1,0 +1,7 @@
+C:\VisualStudio\Projects\Training_SAIDNumberValidation\IsValidIDNumber\IsValidIDNumber\bin\Debug\IsValidIDNumber.dll
+C:\VisualStudio\Projects\Training_SAIDNumberValidation\IsValidIDNumber\IsValidIDNumber\bin\Debug\IsValidIDNumber.pdb
+C:\VisualStudio\Projects\Training_SAIDNumberValidation\IsValidIDNumber\IsValidIDNumber\bin\Debug\nunit.framework.dll
+C:\VisualStudio\Projects\Training_SAIDNumberValidation\IsValidIDNumber\IsValidIDNumber\bin\Debug\nunit.framework.xml
+C:\VisualStudio\Projects\Training_SAIDNumberValidation\IsValidIDNumber\IsValidIDNumber\obj\Debug\IsValidIDNumber.csprojResolveAssemblyReference.cache
+C:\VisualStudio\Projects\Training_SAIDNumberValidation\IsValidIDNumber\IsValidIDNumber\obj\Debug\IsValidIDNumber.dll
+C:\VisualStudio\Projects\Training_SAIDNumberValidation\IsValidIDNumber\IsValidIDNumber\obj\Debug\IsValidIDNumber.pdb
