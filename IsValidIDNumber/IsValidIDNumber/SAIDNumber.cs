@@ -9,12 +9,13 @@ namespace IsValidIDNumber
 {
     public class SAIDNumber
     {
-        private string idnumber;
+//        private readonly string idnumber;
+//
+//        public SAIDNumber(string inputidnumber)
+//        {
+//            idnumber = inputidnumber;
+//        }
 
-        public SAIDNumber(string inputidnumber)
-        {
-            idnumber = inputidnumber;
-        }
         public bool IsValidLength(string idnumber)
         {
             if (idnumber.Length != 13)
@@ -115,7 +116,8 @@ namespace IsValidIDNumber
 
         public bool ControlDigitEqualsCheckSum(string inputString)
         {
-            //int controlDigit = idnumber.ControlDigit();
+            int controlDigit = new SAIDNumber().ControlDigit(inputString);
+//            new SAIDNumber().
             return true;
         }
 
@@ -133,14 +135,19 @@ namespace IsValidIDNumber
     [TestFixture]
     public class SAIDNumberTest
     {
-
+        private SAIDNumber _saIDNumber;
+        [TestFixtureSetUp]
+        public void Setup()
+        {
+            _saIDNumber = new SAIDNumber();
+        }
         [Test]
         public void Has13Digits()
         {
             //Arrange
             var idnumber = "1234567890123";
             //Act			
-            var sut = new SAIDNumber().IsValidLength(idnumber);
+            var sut = _saIDNumber.IsValidLength(idnumber);
             //Assert			
             Assert.That(sut,Is.EqualTo(true));
         }
@@ -161,7 +168,7 @@ namespace IsValidIDNumber
         [TestCase("12345678901234", false)]
         public void MoreThenThirteenAndLessThenThirteenReturnsFalse(string inputIdnumber, bool result)
         {
-            var sut = new SAIDNumber().IsValidLength(inputIdnumber);
+            var sut = _saIDNumber.IsValidLength(inputIdnumber);
             //Assert			
             Assert.That(sut,Is.EqualTo(result));
         }
@@ -172,7 +179,7 @@ namespace IsValidIDNumber
         {
             var inputIDNumber = String.Empty;
             //Act			
-            var sut = new SAIDNumber().IsValid(inputIDNumber);
+            var sut = _saIDNumber.IsValid(inputIDNumber);
             //Assert			
             Assert.That(sut, Is.EqualTo(false));
         }
@@ -184,7 +191,7 @@ namespace IsValidIDNumber
         public void Digit3To4IsValidMonth(string inputString, bool expectedResult)
         {
             //Act			
-            var sut = new SAIDNumber().IsValidMonth(inputString);
+            var sut = _saIDNumber.IsValidMonth(inputString);
             //Assert			
             Assert.That(sut,Is.EqualTo(expectedResult));
         }
@@ -195,7 +202,7 @@ namespace IsValidIDNumber
         [TestCase("7706325007081", false)]
         public void Digit5to6IsValidDay(string inputString, bool expectedResult)
         {
-            var sut = new SAIDNumber().IsValidDay(inputString);
+            var sut = _saIDNumber.IsValidDay(inputString);
             //Assert			
             Assert.That(sut, Is.EqualTo(expectedResult));
         }
@@ -206,7 +213,7 @@ namespace IsValidIDNumber
         [TestCase("7706325007081", false)]
         public void IsValidDate(string inputString, bool expectedResult)
         {
-            var sut = new SAIDNumber().IsValidDate(inputString);
+            var sut = _saIDNumber.IsValidDate(inputString);
             //Assert			
             Assert.That(sut, Is.EqualTo(expectedResult));
         }
@@ -216,7 +223,7 @@ namespace IsValidIDNumber
         {
             var idnumber = "77 06 27 5007 08 1";
             //Act			
-            var sut = new SAIDNumber().IsValid(idnumber);
+            var sut = _saIDNumber.IsValid(idnumber);
             //Assert			
             Assert.That(sut, Is.EqualTo(true));
         }
@@ -228,7 +235,7 @@ namespace IsValidIDNumber
             //Arrange
             var inputString = "800101 5009 087";
             //Act			
-            var sut = new SAIDNumber().SumOddNumbers(inputString);
+            var sut = _saIDNumber.SumOddNumbers(inputString);
             //Assert			
             Assert.That(sut, Is.EqualTo(13));
         }
@@ -239,7 +246,7 @@ namespace IsValidIDNumber
             //Arrange
             var inputString = "800101 5009 087";
             //Act			
-            var sut = new SAIDNumber().ConcatenateEvenNumbers(inputString);
+            var sut = _saIDNumber.ConcatenateEvenNumbers(inputString);
             //Assert			
             Assert.That(sut, Is.EqualTo(011098));
         }
@@ -249,7 +256,7 @@ namespace IsValidIDNumber
         [TestCase("7706275007081", true)]
         public void IsNumericOnly(String inputString, bool expectedResult)
         {
-            var sut = new SAIDNumber().IsNumericOnly(inputString);
+            var sut = _saIDNumber.IsNumericOnly(inputString);
             //Assert			
             Assert.That(sut, Is.EqualTo(expectedResult));
         }
@@ -259,7 +266,7 @@ namespace IsValidIDNumber
         [TestCase("7806240002082", "Female")]
         public void SeventhDigitReturnsGender(string inputString, string expectedResult)
         {
-            var sut = new SAIDNumber().Gender(inputString);
+            var sut = _saIDNumber.Gender(inputString);
             //Assert			
             Assert.That(sut,Is.EqualTo(expectedResult));
         }
@@ -269,16 +276,16 @@ namespace IsValidIDNumber
         [TestCase("7806240002082", 2)]
         public void ControlDigitIsLastDigit(string inputString,int expectedResult)
         {
-            var sut = new SAIDNumber().ControlDigit(inputString);
+            var sut = _saIDNumber.ControlDigit(inputString);
             Assert.That(sut, Is.EqualTo(expectedResult));
         }
 
 
         [TestCase("7706275007081", true)]
         [TestCase("7806240002082", true)]
-        public void CheckControlDigitAgainstCheckSum(SAIDNumber idnumber, bool expectedResult)
+        public void CheckControlDigitAgainstCheckSum(string idnumber, bool expectedResult)
         {
-            var sut = new SAIDNumber().ControlDigitEqualsCheckSum(idnumber);
+            var sut = _saIDNumber.ControlDigitEqualsCheckSum(idnumber);
             Assert.That(sut, Is.EqualTo(expectedResult));
         }
 
@@ -289,7 +296,7 @@ namespace IsValidIDNumber
             //Arrange
             var inputString = "22196";
             //Act			
-            var sut = new SAIDNumber().SumNumbersInString(inputString);
+            var sut = _saIDNumber.SumNumbersInString(inputString);
             //Assert			
             Assert.That(sut,Is.EqualTo(20));
         }
