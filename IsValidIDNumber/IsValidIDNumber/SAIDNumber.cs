@@ -9,6 +9,12 @@ namespace IsValidIDNumber
 {
     public class SAIDNumber
     {
+        private string idnumber;
+
+        public SAIDNumber(string inputidnumber)
+        {
+            idnumber = inputidnumber;
+        }
         public bool IsValidLength(string idnumber)
         {
             if (idnumber.Length != 13)
@@ -79,10 +85,48 @@ namespace IsValidIDNumber
                 if (i % 2 != 0)
                 {
                     concatenatedNumber += inputStringreplacedSpaces[i];
-                    Console.WriteLine(inputStringreplacedSpaces[i]+ " ");
                 }
             }
             return Convert.ToInt32(concatenatedNumber);
+        }
+
+        public bool IsNumericOnly(string inputString)
+        {
+            bool isnumeric = true;
+            foreach (char c in inputString)
+            {
+                if (!Char.IsNumber(c))
+                    isnumeric = false;
+            }
+            return isnumeric;
+        }
+
+        public string Gender(string inputString)
+        {
+            if (Convert.ToInt32(inputString.Substring(5, 1)) < 5)
+                return "Female";
+            return "Male";
+        }
+
+        public int ControlDigit(string inputString)
+        {
+            return Convert.ToInt32(inputString.Substring(inputString.Length-1,1));
+        }
+
+        public bool ControlDigitEqualsCheckSum(string inputString)
+        {
+            //int controlDigit = idnumber.ControlDigit();
+            return true;
+        }
+
+        public int SumNumbersInString(string inputString)
+        {
+            int sum = 0;
+            foreach (char c in inputString)
+            {
+                sum += Convert.ToInt32(c.ToString());
+            }
+            return sum;
         }
     }
 
@@ -200,6 +244,55 @@ namespace IsValidIDNumber
             Assert.That(sut, Is.EqualTo(011098));
         }
 
+
+        [TestCase("77O6275OO7081", false)]
+        [TestCase("7706275007081", true)]
+        public void IsNumericOnly(String inputString, bool expectedResult)
+        {
+            var sut = new SAIDNumber().IsNumericOnly(inputString);
+            //Assert			
+            Assert.That(sut, Is.EqualTo(expectedResult));
+        }
+
+
+        [TestCase("7706275007081", "Male")]
+        [TestCase("7806240002082", "Female")]
+        public void SeventhDigitReturnsGender(string inputString, string expectedResult)
+        {
+            var sut = new SAIDNumber().Gender(inputString);
+            //Assert			
+            Assert.That(sut,Is.EqualTo(expectedResult));
+        }
+
+
+        [TestCase("7706275007081", 1)]
+        [TestCase("7806240002082", 2)]
+        public void ControlDigitIsLastDigit(string inputString,int expectedResult)
+        {
+            var sut = new SAIDNumber().ControlDigit(inputString);
+            Assert.That(sut, Is.EqualTo(expectedResult));
+        }
+
+
+        [TestCase("7706275007081", true)]
+        [TestCase("7806240002082", true)]
+        public void CheckControlDigitAgainstCheckSum(SAIDNumber idnumber, bool expectedResult)
+        {
+            var sut = new SAIDNumber().ControlDigitEqualsCheckSum(idnumber);
+            Assert.That(sut, Is.EqualTo(expectedResult));
+        }
+
+
+        [Test]
+        public void SumGivenDigits()
+        {
+            //Arrange
+            var inputString = "22196";
+            //Act			
+            var sut = new SAIDNumber().SumNumbersInString(inputString);
+            //Assert			
+            Assert.That(sut,Is.EqualTo(20));
+        }
 
     }
 }
