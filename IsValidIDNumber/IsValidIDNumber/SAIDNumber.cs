@@ -9,77 +9,56 @@ namespace IsValidIDNumber
 {
     public class SAIDNumber
     {
-        //public string number { get; set; }
-        private string _idNumber;        
-
-//        public SAIDNumber()
-//        {
-//
-//        }
-//
-//        public SAIDNumber(string inputidnumber)
-//        {
-//            number = inputidnumber;
-//        }
-
-       
-
-        
-
-        private void IsValidLength()
-        {           
-            if (_idNumber.Length != 13) throw new IDNumberNotValidLengthException();                
-        }
+        private string _idNumber;   
 
         public void EnsureValidIDNumber(string idNumber)
         {
-            _idNumber = idNumber;
+            _idNumber = idNumber.Trim().Replace(" ", "");
+            IsNumericOnly();
             IsValidLength();
-            //string idnumbertrimmed = inputIdNumber.Trim();
-            //string idnumberReplaceStrings = idnumbertrimmed.Replace(" ", "");
-            //if (!IsValidLength(idnumberReplaceStrings) || 
-            //    !IsValidMonth(idnumberReplaceStrings) || 
-            //    !IsValidDate(idnumberReplaceStrings) || 
-            //    !IsValidDay(idnumberReplaceStrings))
-            //return false;
-            //return true;
+            IsValidMonth();
+            IsValidDay();
+            IsValidDate();
+            ControlDigitEqualsCheckSum();
         }
 
-        public bool IsValidMonth(string inputString)
+        private void IsValidLength()
         {
-            int month = Convert.ToInt32(inputString.Substring(2, 2));
-            if (month < 1 || month > 12 )
-                return false;
-            return true;
+            if (_idNumber.Length != 13) throw new IDNumberNotValidLengthException();
         }
 
-        public bool IsValidDay(string inputString)
+
+        private void IsValidMonth()
         {
-            int day = Convert.ToInt32(inputString.Substring(4, 2));
-            if (day < 1 || day > 31)
-                return false;
-            return true;
+            int month = Convert.ToInt32(_idNumber.Substring(2, 2));
+            if (month < 1 || month > 12) throw new InvalidMonthException();
         }
 
-        public bool IsValidDate(string inputString)
+        private void IsValidDay()
         {
-            string yyMMdd = inputString.Substring(0, 6);
+            int day = Convert.ToInt32(_idNumber.Substring(4, 2));
+            if (day < 1 || day > 31) throw new InvalidDayException();
+        }
+
+        private void IsValidDate()
+        {
+            string yyMMdd = _idNumber.Substring(0, 6);
             DateTime dateValue;
-            return (DateTime.TryParseExact(yyMMdd, "yyMMdd", CultureInfo.InvariantCulture, DateTimeStyles.None, out dateValue));
+            
+            if (!DateTime.TryParseExact(yyMMdd, "yyMMdd", CultureInfo.InvariantCulture, DateTimeStyles.None, out dateValue)) throw new InvalidDateException();
         }
 
-        public int SumOddNumbers(string inputString)
+        internal int SumOddNumbers()
         {
             //8001015009087
             //8 0 0 5 0 0 
-            //Console.WriteLine("TEST");
             int sumOddNumber = 0;
-            string inputStringreplacedSpaces = inputString.Replace(" ", "");
+            string inputStringreplacedSpaces = _idNumber.Replace(" ", "");
+            Console.WriteLine(inputStringreplacedSpaces);
             for (int i = 0; i < inputStringreplacedSpaces.Length-1; i++)
             {
                 if (i%2 == 0)
                 {
-                    //sumOddNumber += Convert.ToInt32(inputStringreplacedSpaces[i]);
                     sumOddNumber += Convert.ToInt32(inputStringreplacedSpaces[i].ToString());
                     //Console.WriteLine(inputStringreplacedSpaces[i]+ " "+ sumOddNumber);
                 }
@@ -87,10 +66,10 @@ namespace IsValidIDNumber
             return sumOddNumber;
         }
 
-        public int ConcatenateEvenNumbers(string inputString)
+        public int ConcatenateEvenNumbers()
         {
             string concatenatedNumber = String.Empty;
-            string inputStringreplacedSpaces = inputString.Replace(" ", "");
+            string inputStringreplacedSpaces = _idNumber.Replace(" ", "");
             for (int i = 0; i < inputStringreplacedSpaces.Length - 1; i++)
             {
                 if (i % 2 != 0)
@@ -101,15 +80,12 @@ namespace IsValidIDNumber
             return Convert.ToInt32(concatenatedNumber);
         }
 
-        public bool IsNumericOnly(string inputString)
+        public void IsNumericOnly()
         {
-            bool isnumeric = true;
-            foreach (char c in inputString)
+            foreach (char c in _idNumber)
             {
-                if (!Char.IsNumber(c))
-                    isnumeric = false;
+                if (!Char.IsNumber(c)) throw new InvalidCharactersException();
             }
-            return isnumeric;
         }
 
         public string Gender(string inputString)
@@ -119,20 +95,23 @@ namespace IsValidIDNumber
             return "Male";
         }
 
-        public int ControlDigit(string inputString)
+        public int GetControlDigit()
         {
-            return Convert.ToInt32(inputString.Substring(inputString.Length-1,1));
+            Console.WriteLine(_idNumber + " " + Convert.ToInt32(_idNumber.Substring(_idNumber.Length - 1, 1)));
+            return Convert.ToInt32(_idNumber.Substring(_idNumber.Length-1,1));
+            
         }
 
-        public bool ControlDigitEqualsCheckSum(string idnumber)
+        public void ControlDigitEqualsCheckSum()
         {
-            ControlDigit(idnumber);
-            SumOddNumbers(idnumber);
+            Console.WriteLine("CheckSum" + (10 - (SumOddNumbers() + SumNumbersInString((ConcatenateEvenNumbers() * 2).ToString())) % 10).ToString() + 
+                              " SumOddNumbers " +SumOddNumbers()+
+                              " Even " + SumNumbersInString((ConcatenateEvenNumbers() * 2).ToString()) +
 
-            //int controlDigit = this.ControlDigit();
-            //Cons
-            
-            return true;
+                              " " + GetControlDigit());
+            if ((10 - (SumOddNumbers() + SumNumbersInString((ConcatenateEvenNumbers() * 2).ToString())) % 10) !=
+                GetControlDigit())
+                throw new IDNumberChecksumException();
         }
 
         public int SumNumbersInString(string inputString)
@@ -144,6 +123,26 @@ namespace IsValidIDNumber
             }
             return sum;
         }
+    }
+
+    public class IDNumberChecksumException : Exception
+    {
+    }
+
+    public class InvalidCharactersException : Exception
+    {
+    }
+
+    internal class InvalidDateException : Exception
+    {
+    }
+
+    public class InvalidDayException : Exception
+    {
+    }
+
+    public class InvalidMonthException : Exception
+    {
     }
 
     public class IDNumberNotValidLengthException : Exception
@@ -159,144 +158,107 @@ namespace IsValidIDNumber
     public class SAIDNumberTest
     {
         private SAIDNumber _saIDNumber;
-//        private SAIDNumber Id1;
-//        private SAIDNumber Id2;
 
         [TestFixtureSetUp]
         public void Setup()
         {
             _saIDNumber = new SAIDNumber();
-            
-//            Id1 =new SAIDNumber("7706275007081");
-//            Id2 =new SAIDNumber("7806240002082");
-
         }
-
-
-
+        
         [Test]
-        public void Has13Digits()
+        public void IsValidIdNumber()
         {
-            //Arrange
-            var idnumber = "1234567890123";
-            //Act			
-            var sut = _saIDNumber.EnsureValidIDNumber;
-            //Assert			
-            Assert.That(sut,Is.EqualTo(true));
+            var idnumber = "7706275007081";
+            _saIDNumber.EnsureValidIDNumber(idnumber);
+            Assert.Pass("Is Valid IDNumber");
         }
 
 
         [Test]
-        public void NumericCharactersOnly()
+        public void CanIgnoreSpaces()
         {
-            //Arrange
-            //Act			
-            //Assert			
+            var inputString = "77 06 27 5007 08 1";
+            _saIDNumber.EnsureValidIDNumber(inputString);
+            Assert.Pass("Is Valid IDNumer");
         }
 
 
-
-
-        [TestCase("1",false)]
-        [TestCase("12345678901234", false)]
-        [TestCase("1234567890123", true)]
-
-        public void MoreThenThirteenAndLessThenThirteenReturnsFalse(string inputIdnumber, bool result)
+        [TestCase("1")]
+        [TestCase("12345678901234")]
+        [TestCase("")]
+        public void IDNumberIsCorrectLength(string inputIdnumber)
         {
-            var sut = _saIDNumber.IsValidLength(inputIdnumber);
-            //Assert			
-            Assert.That(sut,Is.EqualTo(result));
+            Assert.Throws(Is.TypeOf<IDNumberNotValidLengthException>(), () => _saIDNumber.EnsureValidIDNumber(inputIdnumber));
         }
 
 
         [Test]
-        public void EmtyStringReturnsFalse()
+        public void EmptyStringThrowsInvalidLenghtException()
         {
             var inputIDNumber = String.Empty;
-            //Act			
-            Assert.Throws<>() _saIDNumber.EnsureValidIDNumber(inputIDNumber);
-            //Assert			
-            Assert.That(sut, Is.EqualTo(false));
+            Assert.Throws(Is.TypeOf<IDNumberNotValidLengthException>(),() => _saIDNumber.EnsureValidIDNumber(inputIDNumber));
+
         }
 
-
-        [TestCase("7706275007081",true)]
         [TestCase("7713275007081", false)]
         [TestCase("7700275007081", false)]
         public void Digit3To4IsValidMonth(string inputString, bool expectedResult)
         {
-            //Act			
-            var sut = _saIDNumber.IsValidMonth(inputString);
-            //Assert			
-            Assert.That(sut,Is.EqualTo(expectedResult));
+            Assert.Throws(Is.TypeOf<InvalidMonthException>(), () => _saIDNumber.EnsureValidIDNumber(inputString));
         }
 
 
-        [TestCase("7706275007081",true)]
         [TestCase("7706005007081", false)]
         [TestCase("7706325007081", false)]
         public void Digit5to6IsValidDay(string inputString, bool expectedResult)
         {
-            var sut = _saIDNumber.IsValidDay(inputString);
-            //Assert			
-            Assert.That(sut, Is.EqualTo(expectedResult));
+            Assert.Throws(Is.TypeOf<InvalidDayException>(), () => _saIDNumber.EnsureValidIDNumber(inputString));
         }
 
+        
         [TestCase("7702315007081", false)]
         [TestCase("7702295007081", false)]
         [TestCase("7704315007081", false)]
         [TestCase("7706325007081", false)]
-        public void IsValidDate(string inputString, bool expectedResult)
+        public void InvalidDateThrowsException(string inputString, bool expectedResult)
         {
-            var sut = _saIDNumber.IsValidDate(inputString);
-            //Assert			
-            Assert.That(sut, Is.EqualTo(expectedResult));
+            try
+            {
+                _saIDNumber.EnsureValidIDNumber(inputString);
+            }
+            catch (InvalidDayException)
+            {
+
+            }
+            catch (InvalidDateException)
+            {
+                Assert.True(true);
+            }
+            
         }
 
         [Test]
-        public void IgnoresSpaces()
+        public void ReturnsTheSumOfOddNumberInString()
         {
-            var idnumber = "77 06 27 5007 08 1";
-            //Act			
-            var sut = _saIDNumber.EnsureValidIDNumber(idnumber);
-            //Assert			
-            Assert.That(sut, Is.EqualTo(true));
-        }
-
-
-        [Test]
-        public void SumOfOddNumbers()
-        {
-            //Arrange
             var inputString = "800101 5009 087";
-            //Act			
-            var sut = _saIDNumber.SumOddNumbers(inputString);
-            //Assert			
-            Assert.That(sut, Is.EqualTo(13));
+            _saIDNumber.EnsureValidIDNumber(inputString);
+            Assert.That(_saIDNumber.SumOddNumbers(), Is.EqualTo(13));
         }
 
         [Test]
-        public void ConcatenateEvenNumbers()
+        public void ReturnsConcatenatedStringFromInputString()
         {
-            //Arrange
             var inputString = "800101 5009 087";
-            //Act			
-            var sut = _saIDNumber.ConcatenateEvenNumbers(inputString);
-            //Assert			
-            Assert.That(sut, Is.EqualTo(011098));
+            _saIDNumber.EnsureValidIDNumber(inputString);
+            Assert.That(_saIDNumber.ConcatenateEvenNumbers(), Is.EqualTo(011098));
         }
 
-
-        [TestCase("77O6275OO7081", false)]
-        [TestCase("7706275007081", true)]
-        public void IsNumericOnly(String inputString, bool expectedResult)
+        [TestCase("A7O627500708O")]
+        public void StringWithNonNumericCharactersThrowException(String inputString)
         {
-            var sut = _saIDNumber.IsNumericOnly(inputString);
-            //Assert			
-            Assert.That(sut, Is.EqualTo(expectedResult));
+            Assert.Throws(Is.TypeOf<InvalidCharactersException>(), () => _saIDNumber.EnsureValidIDNumber(inputString));
         }
-
-
+        
         [TestCase("7706275007081", "Male")]
         [TestCase("7806240002082", "Female")]
         public void SeventhDigitReturnsGender(string inputString, string expectedResult)
@@ -311,40 +273,23 @@ namespace IsValidIDNumber
         [TestCase("7806240002082", 2)]
         public void ControlDigitIsLastDigit(string inputString,int expectedResult)
         {
-            var sut = _saIDNumber.ControlDigit(inputString);
-            Assert.That(sut, Is.EqualTo(expectedResult));
+           _saIDNumber.EnsureValidIDNumber(inputString);
+            Assert.That(_saIDNumber.GetControlDigit(), Is.EqualTo(expectedResult));
         }
-
 
         [Test]
         public void SumGivenDigits()
         {
-            //Arrange
             var inputString = "22196";
-            //Act			
             var sut = _saIDNumber.SumNumbersInString(inputString);
-            //Assert			
             Assert.That(sut,Is.EqualTo(20));
         }
-
-//        [Test]
-//        public void SetIDNumber()
-//        {
-//            var inputString = "7706275007081";
-//            var sut = new SAIDNumber(inputString);
-//            _saIDNumber.number = inputString;
-//            Assert.That(sut, Is.EqualTo(_saIDNumber));
-//        }
-
-
-//        [TestCase(typeof(SAIDNumber), true)]
-//        public void CheckControlDigitAgainstCheckSum(SAIDNumber idnumber, bool expectedResult)
+        
         [Test]
-        public void CheckControlDigitAgainstCheckSum()
+        public void CheckControlDigitAgainstCheckSumFail()
         {
-            var inputString = "7706275007081";
-            var sut = new SAIDNumber().ControlDigitEqualsCheckSum(inputString);
-            Assert.That(sut, Is.EqualTo(true));
+            var inputString = "800101 5009 086";
+            Assert.Throws(Is.TypeOf<IDNumberChecksumException>(), () => _saIDNumber.EnsureValidIDNumber(inputString));
         }
 
     }
